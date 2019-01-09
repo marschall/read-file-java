@@ -1,15 +1,10 @@
 package com.github.marschall.readfilejava;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.YEAR;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.SignStyle;
 import java.util.function.Consumer;
 
 import org.eclipse.collections.api.bag.MutableBag;
@@ -28,30 +23,30 @@ public class ReadFile {
       System.err.println("usage: file");
       System.exit(-1);
     }
+    
+    long start = System.currentTimeMillis();
     var csvParser = new CsvParser('|');;
     var path = Paths.get(args[0]);
     var parseContext = new ParseContext();
     
     csvParser.parse(path, US_ASCII, parseContext);
     
-    MutableBag<String> firstNames = parseContext.getFirstNames();
-    ObjectIntPair<String> topOccurance = firstNames.topOccurrences(1).getFirst();
-    System.out.println("The most common first name is: " + topOccurance.getOne()
-      + " and it occurs: " + topOccurance.getTwo() + " times.");
+    System.out.println("Total file line count: " + parseContext.getLineCount());
+    
     MutableBag<YearMonth> donations = parseContext.getDonations();
     donations.forEachWithOccurrences((donation, occurrence) -> {
       System.out.println("Donations per month and year: "
           + donation + " and donation count: " + occurrence);
     });
 
+    ObjectIntPair<String> mostCommonName = parseContext.getMostCommonName();
+    System.out.println("The most common first name is: " + mostCommonName.getOne()
+      + " and it occurs: " + mostCommonName.getTwo() + " times.");
+    
+    System.out.println(System.currentTimeMillis() - start);
   }
   
   static final class ParseContext implements Consumer<Row> {
-
-    private static final DateTimeFormatter DONATION_PARSER = new DateTimeFormatterBuilder()
-        .appendValue(YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
-        .appendValue(MONTH_OF_YEAR, 2)
-        .toFormatter();
     
     private long lineCount;
     
@@ -85,22 +80,38 @@ public class ReadFile {
       this.firstNames.add(firstName);
     }
     
+    private long getLineNumber() {
+      return this.lineCount;
+    }
+    
     long getLineCount() {
       return this.lineCount;
+    }
+    
+    ObjectIntPair<String> getMostCommonName() {
+      return this.firstNames.topOccurrences(1).getFirst();
     }
     
 
     @Override
     public void accept(Row row) {
       this.incrementLineCount();
+      
       CellSet cellSet = row.getCellSet();
       while (cellSet.next()) {
         int columnIndex = cellSet.getColumnIndex();
         if (columnIndex == 4) {
-          YearMonth dondationMonth = YearMonth.parse(cellSet.getCharSequence().subSequence(0, 6), DONATION_PARSER); // a custom parser would be faster
+          YearMonth dondationMonth = parseDonation(cellSet.getCharSequence());
           this.addDonation(dondationMonth);
         } else if (columnIndex == 7) {
-          String firstName = extractFirstName(cellSet.getCharSequence());
+          CharSequence name = cellSet.getCharSequence();
+
+          long lineNumber = this.getLineNumber(); // 1 based
+          if (lineNumber == 432L || lineNumber == 43243L) {
+            System.out.println("Name: " + name + " at index: " + lineNumber);
+          }
+          
+          String firstName = extractFirstName(name);
           if (firstName != null) {
             this.addFristName(firstName);
           }
@@ -108,6 +119,13 @@ public class ReadFile {
           break;
         }
       }
+    }
+    
+    static YearMonth parseDonation(CharSequence donation) {
+      // use this because of DateTimeFormatterBuilder because it allocates a lot less
+      int year = Integer.parseInt(donation, 0, 4, 10);
+      int month = Integer.parseInt(donation, 4, 6, 10);
+      return YearMonth.of(year, month);
     }
     
     static String extractFirstName(CharSequence name) {
