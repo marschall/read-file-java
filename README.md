@@ -9,4 +9,4 @@ We use the following approach for parsing
   * This allows us to drastically cut down on string allocations.
 * Use an Eclipse Collections Bag or counting it occurrences of months and first names.
 * Use YearMonth instead of a formatted String for representing a month.
-  * Use Integer.parseInt for parsing the YearMonth instead of DateTimeFormatterBuilder because is drastically cuts down on allocations
+  * Use Integer.parseInt for parsing the YearMonth instead of DateTimeFormatterBuilder because is drastically cuts down on allocations. This causes a noticeable speed improvement.
