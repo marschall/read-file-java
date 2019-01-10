@@ -60,7 +60,7 @@
     <dependency>
       <groupId>com.github.marschall</groupId>
       <artifactId>mini-csv</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
+      <version>0.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.collections</groupId>
@@ -137,11 +137,18 @@
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
           <filters>
+            <!--  -->
             <filter>
               <artifact>*:*</artifact>
               <excludes>
+                <!-- Jigsaw modules -->
                 <exclude>module-info.class</exclude>
+                <!-- Jandex indices -->
                 <exclude>META-INF/jandex.idx</exclude>
+                <!-- signed JARs -->
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
               </excludes>
             </filter>
           </filters>
