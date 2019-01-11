@@ -21,3 +21,7 @@ time java -Xmx16m -cp target/read-file-java-0.1.0-SNAPSHOT-shaded.jar com.github
 ```
 time java -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -XX:+UseJVMCICompiler
 ``
+
+```
+time java -Xmx6g -XX:+UnlockExperimentalVMOptions  -XX:+UseEpsilonGC
+``
