@@ -23,5 +23,5 @@ time java -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -XX:+UseJVMCICompile
 ```
 
 ```
-time java -Xmx6g -XX:+UnlockExperimentalVMOptions  -XX:+UseEpsilonGC
-``
+time java -Xmx6g -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC
+```
