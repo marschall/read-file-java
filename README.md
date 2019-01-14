@@ -25,3 +25,7 @@ time java -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -XX:+UseJVMCICompile
 ```
 time java -Xmx6g -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC
 ```
+
+```
+-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:StartFlightRecording:filename=read-file-java.jfr:settings=$HOME/git/read-file-java/read-file-java.jfc -XX:FlightRecorderOptions:stackdepth=128
+```
