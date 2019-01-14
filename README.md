@@ -16,7 +16,7 @@ We use the following approach for parsing
 
 ```
 time java -Xmx16m -cp target/read-file-java-0.1.0-SNAPSHOT-shaded.jar com.github.marschall.readfilejava.ReadFile /path/to/file
-``
+```
 
 ```
 time java -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -XX:+UseJVMCICompiler
